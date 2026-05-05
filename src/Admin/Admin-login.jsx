@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
-import './AdminLogin.css'
+import './Admin-login.css'
 
 const swalConfig = {
   background: 'linear-gradient(to right, #0d1a64, #24163e)',

@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Login from './login/Login'
 import Registro from './registro/Registro'
-import Panel from './alumnos/Panel'
-import AdminLogin from './admin/AdminLogin'
-import AdminPanel from './admin/AdminPanel'
+import Panel from "./alumnos-panel/Panel"
+import AdminLogin from './Admin/Admin-Login'
+import AdminPanel from './Admin/Admin-Panel'
 import './App.css'
 
 function App() {
