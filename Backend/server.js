@@ -1,6 +1,4 @@
 import { config } from 'dotenv'
-config()
-
 import express from 'express'
 import cors from 'cors'
 import bcrypt from 'bcrypt'
@@ -9,6 +7,7 @@ import { initTablas } from './tablas.js'
 import { helmet, limitador, limitadorLogin } from './seguridad.js'
 import process from 'node:process'
 
+config()
 await initTablas()
 
 const app = express()

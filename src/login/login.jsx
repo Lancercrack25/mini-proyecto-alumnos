@@ -52,7 +52,7 @@ const Login = () => {
           title: `¡Bienvenido ${data.alumno.nombre}!`,
           text: 'Login exitoso.',
           confirmButtonText: 'Entrar'
-        }).then(() => navigate('/panel'))
+        }).then(() => navigate('/Panel'))
       } else {
         Swal.fire({ ...swalConfig, icon: 'error', title: 'Error', text: data.error })
       }

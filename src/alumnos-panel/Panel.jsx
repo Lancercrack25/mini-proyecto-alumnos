@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import './Panel.css'
+import useAlumno from '../hooks/usealumno'
 
+//esta es la interfaz la cual svera el alumno una vez que haya iniciado sesion, aqui podra ver su informacion y editarla, ademas de eliminar su cuenta o cerrar sesion
 const swalConfig = {
   background: 'linear-gradient(to right, #0d1a64, #24163e)',
   color: '#fff',
@@ -10,49 +12,22 @@ const swalConfig = {
   confirmButtonText: 'Entendido'
 }
 
-const alumnoGuardado = JSON.parse(localStorage.getItem('alumno') || 'null')
-
 const Panel = () => {
-  const [alumno, setAlumno] = useState(alumnoGuardado)
+  const { alumno, form, handleChange, actualizarAlumno, eliminarAlumno, cerrarSesion } = useAlumno()
   const [editando, setEditando] = useState(false)
-  const [form, setForm] = useState(alumnoGuardado || {})
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (!alumnoGuardado) {
-      navigate('/')
-    }
-  }, [navigate])
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
+    if (!alumno) navigate('/')
+  }, [alumno, navigate])
 
   const handleActualizar = async () => {
-    try {
-      const res = await fetch(`http://localhost:3000/alumnos/${alumno.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nombre: form.nombre,
-          carrera: form.carrera,
-          email: form.email,
-          telefono: form.telefono
-        })
-      })
-      const data = await res.json()
-
-      if (res.ok) {
-        localStorage.setItem('alumno', JSON.stringify(data.alumno))
-        setAlumno(data.alumno)
-        setForm(data.alumno)
-        setEditando(false)
-        Swal.fire({ ...swalConfig, icon: 'success', title: '✅ Datos actualizados', confirmButtonText: 'Ok' })
-      } else {
-        Swal.fire({ ...swalConfig, icon: 'error', title: 'Error', text: data.error })
-      }
-    } catch {
-      Swal.fire({ ...swalConfig, icon: 'error', title: 'Error', text: 'No se pudo conectar con el servidor.' })
+    const result = await actualizarAlumno(alumno.id)
+    if (result.ok) {
+      setEditando(false)
+      Swal.fire({ ...swalConfig, icon: 'success', title: '✅ Datos actualizados', confirmButtonText: 'Ok' })
+    } else {
+      Swal.fire({ ...swalConfig, icon: 'error', title: 'Error', text: result.error })
     }
   }
 
@@ -70,9 +45,8 @@ const Panel = () => {
     })
 
     if (confirm.isConfirmed) {
-      try {
-        await fetch(`http://localhost:3000/alumnos/${alumno.id}`, { method: 'DELETE' })
-        localStorage.removeItem('alumno')
+      const result = await eliminarAlumno(alumno.id)
+      if (result.ok) {
         Swal.fire({
           ...swalConfig,
           icon: 'success',
@@ -80,8 +54,8 @@ const Panel = () => {
           text: 'Tu cuenta fue eliminada correctamente.',
           confirmButtonText: 'Ok'
         }).then(() => navigate('/'))
-      } catch {
-        Swal.fire({ ...swalConfig, icon: 'error', title: 'Error', text: 'No se pudo eliminar la cuenta.' })
+      } else {
+        Swal.fire({ ...swalConfig, icon: 'error', title: 'Error', text: result.error })
       }
     }
   }
@@ -98,7 +72,7 @@ const Panel = () => {
       cancelButtonColor: '#444'
     }).then((result) => {
       if (result.isConfirmed) {
-        localStorage.removeItem('alumno')
+        cerrarSesion()
         navigate('/')
       }
     })
@@ -149,15 +123,15 @@ const Panel = () => {
           <div className="panel-editar">
             <div className="form-grupo">
               <label>Nombre</label>
-              <input type="text" name="nombre" value={form.nombre} onChange={handleChange} />
+              <input type="text" name="nombre" value={form.nombre || ''} onChange={handleChange} />
             </div>
             <div className="form-grupo">
               <label>Carrera</label>
-              <input type="text" name="carrera" value={form.carrera} onChange={handleChange} />
+              <input type="text" name="carrera" value={form.carrera || ''} onChange={handleChange} />
             </div>
             <div className="form-grupo">
               <label>Email</label>
-              <input type="text" name="email" value={form.email} onChange={handleChange} />
+              <input type="text" name="email" value={form.email || ''} onChange={handleChange} />
             </div>
             <div className="form-grupo">
               <label>Teléfono</label>

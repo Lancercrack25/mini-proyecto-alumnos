@@ -1,8 +1,7 @@
 import pkg from 'pg'
 import dotenv from 'dotenv'
-
+import process from 'node:process'
 dotenv.config()
-
 const { Pool, Client } = pkg
 
 const adminClient = new Client({
